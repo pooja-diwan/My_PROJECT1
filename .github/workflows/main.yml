@@ -1,0 +1,34 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [11, 8]  
+
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  
+
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java-version }}  
+
+    - name: Build with Maven
+      run: mvn clean install
+
+    - name: Deploy to Staging
+      run: |
+        echo "Deploying application to staging"
+        curl -X POST https://your-api.com/deploy -H "Authorization: Bearer ${{ secrets.DEPLOYMENT_API_KEY }}"
+      env:
+        API_URL: "https://staging-api.com"  
